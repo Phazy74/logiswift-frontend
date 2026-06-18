@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+@theme {
+  /* Default Light Mode Colors */
+  --color-background: #ffffff;
+  --color-foreground: #0f172a;
+  --color-primary: #2563eb;
+  --color-glass-bg: rgba(255, 255, 255, 0.8);
+  --color-glass-border: rgba(0, 0, 0, 0.1);
+  --color-nav-bg: rgba(255, 255, 255, 0.9);
+}
+
+/* Dark Mode Overrides */
+.dark {
+  --color-background: #0a0d14;
+  --color-foreground: #ffffff;
+  --color-primary: #3b82f6;
+  --color-glass-bg: rgba(255, 255, 255, 0.03);
+  --color-glass-border: rgba(255, 255, 255, 0.1);
+  --color-nav-bg: rgba(10, 13, 20, 0.95);
+}
+
+@layer base {
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+}
+
+@layer components {
+  .glass-card {
+    background-color: var(--color-glass-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--color-glass-border);
+    border-radius: 1rem;
+  }
+
+  .nav-blur {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background-color: var(--color-nav-bg);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--color-glass-border);
+  }
+}
+/* src/app/globals.css */
+@layer utilities {
+  .mask-radial {
+    mask-image: radial-gradient(circle, black 30%, transparent 80%);
+  }
+  .mask-linear-right {
+    mask-image: linear-gradient(to right, transparent, black 40%);
+  }
+}
