@@ -9,7 +9,7 @@ import {
   Search, Truck, Globe, Shield, Plane, Ship, 
   Warehouse, Zap, BarChart3, Headphones 
 } from 'lucide-react';
-import Counter from '../../components/shared/Counter';
+import Counter from '../components/shared/Counter';
 
 const fadeInUp: Variants = {
   hidden: { opacity: 0, y: 40 },
