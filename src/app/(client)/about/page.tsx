@@ -15,7 +15,9 @@ const fadeInUp: Variants = {
     y: 0, 
     transition: { duration: 0.8, ease: "easeOut" } 
   }
-};
+}as const; 
+
+
 
 export default function AboutPage() {
   return (

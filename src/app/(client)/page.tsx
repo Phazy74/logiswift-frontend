@@ -18,12 +18,12 @@ const fadeInUp: Variants = {
     y: 0, 
     transition: { duration: 0.8, ease: "easeOut" } 
   }
-};
+}as const;
 
-const staggerContainer = {
+const staggerContainer: Variants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { staggerChildren: 0.2 } }
-};
+}as const;
 
 export default function HomePage() {
   const [trackId, setTrackId] = useState("");
