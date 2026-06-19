@@ -97,23 +97,43 @@ export default function TrackingResultPage({ params }: { params: Promise<{ track
                </div>
             </div>
 
-            {/* DETAILS GRID */}
-            <div className="grid md:grid-cols-2 gap-6 text-slate-700">
-               <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Route Details</p>
-                  <div className="space-y-4">
-                     <div><p className="text-[10px] font-bold text-slate-400">SENDER</p><p className="text-sm font-bold">{shipment.senderName}</p></div>
-                     <div><p className="text-[10px] font-bold text-slate-400">DESTINATION</p><p className="text-sm font-bold">{shipment.destination?.address}</p></div>
-                  </div>
-               </div>
-               <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Cargo Specs</p>
-                  <div className="space-y-4">
-                     <div><p className="text-[10px] font-bold text-slate-400">WEIGHT</p><p className="text-sm font-bold">{shipment.weight || 'N/A'}</p></div>
-                     <div><p className="text-[10px] font-bold text-slate-400">SERVICE</p><p className="text-sm font-bold text-blue-600 uppercase">{shipment.serviceType}</p></div>
-                  </div>
-               </div>
-            </div>
+{/* DETAILS GRID */}
+<div className="grid md:grid-cols-2 gap-6 text-slate-700">
+   <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
+      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Route Details</p>
+      <div className="space-y-4">
+         <div>
+            <p className="text-[10px] font-bold text-slate-400 uppercase">Origin / Sender</p>
+            <p className="text-sm font-bold text-slate-800">{shipment.senderName}</p>
+            <p className="text-xs text-slate-500">{shipment.senderAddress}</p>
+         </div>
+         <div>
+            <p className="text-[10px] font-bold text-slate-400 uppercase">Destination / Receiver</p>
+            <p className="text-sm font-bold text-slate-800">{shipment.receiverName}</p>
+            {/* THIS IS THE FIX: Accessing receiverAddress directly */}
+            <p className="text-sm font-bold text-blue-600">{shipment.receiverAddress || "City not set"}</p>
+         </div>
+      </div>
+   </div>
+
+   <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
+      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Cargo Specifications</p>
+      <div className="space-y-6">
+         <div className="flex justify-between items-center border-b border-slate-50 pb-4">
+            <span className="text-[10px] font-bold text-slate-400 uppercase">Weight</span>
+            <span className="text-sm font-black text-slate-800">{shipment.weight || '0.0 kg'}</span>
+         </div>
+         <div className="flex justify-between items-center border-b border-slate-50 pb-4">
+            <span className="text-[10px] font-bold text-slate-400 uppercase">Service</span>
+            <span className="text-sm font-black text-blue-600 uppercase">{shipment.serviceType}</span>
+         </div>
+         <div className="flex justify-between items-center">
+            <span className="text-[10px] font-bold text-slate-400 uppercase">Ref Number</span>
+            <span className="text-sm font-mono font-bold text-slate-400">#LOG-{shipment._id?.substring(0,6).toUpperCase()}</span>
+         </div>
+      </div>
+   </div>
+</div>
           </div>
         </div>
       </div>

@@ -1,8 +1,9 @@
 "use client";
+
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
-import { Camera, ArrowRight, Loader2, Image as ImageIcon } from 'lucide-react';
+import { Camera, ArrowRight, Loader2, MapPin, User, Package, Weight } from 'lucide-react';
 import { toast } from 'sonner';
 import API from '../../../../../lib/api';
 
@@ -12,7 +13,7 @@ export default function CreateShipmentPage() {
   const [preview, setPreview] = useState<string | null>(null);
   const { register, handleSubmit } = useForm();
 
-  // Handle Image Selection Preview
+  // 1. Image Preview Logic
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -20,69 +21,119 @@ export default function CreateShipmentPage() {
     }
   };
 
-  const onSubmit = async (data: any) => {
+const onSubmit = async (data: any) => {
     setLoading(true);
     const formData = new FormData();
     
-    // Fill all fields from the LogiTrack UI
-    Object.keys(data).forEach(key => {
-      if (key !== 'productImage') formData.append(key, data[key]);
-    });
+    // Use these exact keys
+    formData.append('productName', data.productName);
+    formData.append('senderName', data.senderName);
+    formData.append('senderAddress', data.senderAddress);
+    formData.append('receiverName', data.receiverName);
+    formData.append('receiverAddress', data.receiverAddress);
+    formData.append('weight', data.weight);
+    formData.append('serviceType', data.serviceType);
+    formData.append('estimatedDelivery', data.estimatedDelivery);
 
     if (data.productImage?.[0]) {
       formData.append('productImage', data.productImage[0]);
     }
 
     try {
-      const res = await API.post('/shipments', formData);
-      toast.success(`Shipment Created: ${res.data.trackingCode}`);
+      await API.post('/shipments', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      toast.success("Shipment Created!");
       router.push('/admin/shipments');
     } catch (err: any) {
-      console.error("Upload Error:", err.response?.data);
-      toast.error(err.response?.data?.message || "Check console for errors");
+      toast.error("Creation failed. Check backend.");
     } finally {
       setLoading(false);
     }
-  };
-
+};
   return (
-    <div className="max-w-6xl mx-auto p-6 bg-slate-50 min-h-screen text-slate-900">
-      <h1 className="text-3xl font-bold mb-8">Generate New Shipment</h1>
+    <div className="max-w-6xl mx-auto p-4 lg:p-10 text-slate-800">
+      <div className="mb-10">
+        <h1 className="text-3xl font-bold tracking-tight">Generate Shipment</h1>
+        <p className="text-slate-500">Add a new item to the fleet and upload cargo proof.</p>
+      </div>
+
       <form onSubmit={handleSubmit(onSubmit)} className="grid lg:grid-cols-3 gap-8">
+        
+        {/* LEFT COLUMN */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
-            <h3 className="font-bold mb-6">Cargo & Image</h3>
-            <input {...register("productName")} placeholder="Item Name" className="w-full border p-4 rounded-xl mb-4" required />
+          
+          {/* Cargo Details */}
+          <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm space-y-6">
+            <div className="flex items-center gap-2 text-blue-600 font-bold text-xs uppercase">
+              <Package size={16} /> Item Information
+            </div>
+            <input {...register("productName")} placeholder="Cargo Name (e.g. Samsung OLED Panels)" className="w-full border border-slate-200 p-4 rounded-2xl outline-none focus:border-blue-500 font-semibold" required />
             
-            {/* Image Upload with Preview */}
-            <div className="relative border-2 border-dashed border-slate-200 rounded-2xl h-48 flex items-center justify-center overflow-hidden">
-              {preview ? (
-                <img src={preview} className="w-full h-full object-cover" alt="Preview" />
-              ) : (
-                <div className="text-center">
-                  <Camera className="mx-auto text-slate-300" />
-                  <p className="text-xs font-bold text-slate-400 mt-2">Click to select product photo</p>
-                </div>
-              )}
-              <input type="file" {...register("productImage")} onChange={handleImageChange} className="absolute inset-0 opacity-0 cursor-pointer" />
+            <div className="relative border-2 border-dashed border-slate-200 rounded-3xl h-64 flex flex-col items-center justify-center overflow-hidden bg-slate-50 hover:bg-slate-100 transition-all cursor-pointer">
+               {preview ? (
+                 <img src={preview} className="w-full h-full object-contain" alt="Preview" />
+               ) : (
+                 <div className="text-center">
+                    <Camera className="mx-auto text-slate-300 mb-2" size={40} />
+                    <p className="text-sm font-bold text-slate-400">Upload Item Image</p>
+                 </div>
+               )}
+               <input type="file" {...register("productImage")} onChange={handleImageChange} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" />
             </div>
           </div>
 
-          <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 grid md:grid-cols-2 gap-6">
-            <input {...register("senderName")} placeholder="Sender Name" className="border p-4 rounded-xl" />
-            <input {...register("receiverName")} placeholder="Receiver Name" className="border p-4 rounded-xl" />
-            <input {...register("weight")} placeholder="Weight (e.g. 12.5 kg)" className="border p-4 rounded-xl" />
-            <input {...register("serviceType")} placeholder="Service Type" className="border p-4 rounded-xl" defaultValue="Standard Delivery" />
+          {/* Route Details */}
+          <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm space-y-6">
+            <div className="flex items-center gap-2 text-blue-600 font-bold text-xs uppercase">
+              <MapPin size={16} /> Route & Destination
+            </div>
+            <div className="grid md:grid-cols-2 gap-6">
+               <div className="space-y-2">
+                 <label className="text-[10px] font-bold text-slate-400 uppercase ml-2">Origin City/Address</label>
+                 <input {...register("senderAddress")} placeholder="e.g. New York, USA" className="w-full border border-slate-200 p-4 rounded-2xl outline-none" required />
+               </div>
+               <div className="space-y-2">
+                 <label className="text-[10px] font-bold text-slate-400 uppercase ml-2">Destination City/Address</label>
+                 <input {...register("receiverAddress")} placeholder="e.g. Lagos, Nigeria" className="w-full border border-slate-200 p-4 rounded-2xl outline-none" required />
+               </div>
+            </div>
           </div>
         </div>
 
+        {/* RIGHT COLUMN (Parties & Stats) */}
         <div className="space-y-6">
-          <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
-             <button type="submit" disabled={loading} className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-3">
-               {loading ? <Loader2 className="animate-spin" /> : "GENERATE SHIPMENT"}
-             </button>
+          <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm space-y-6">
+            <div className="flex items-center gap-2 text-blue-600 font-bold text-xs uppercase">
+              <User size={16} /> Customer Data
+            </div>
+            <input {...register("senderName")} placeholder="Sender Name" className="w-full border border-slate-200 p-4 rounded-2xl outline-none" required />
+            <input {...register("receiverName")} placeholder="Receiver Name" className="w-full border border-slate-200 p-4 rounded-2xl outline-none" required />
           </div>
+
+          <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm space-y-6">
+            <div className="flex items-center gap-2 text-blue-600 font-bold text-xs uppercase">
+              <Weight size={16} /> Specifics
+            </div>
+            <input {...register("weight")} placeholder="Weight (e.g. 450kg)" className="w-full border border-slate-200 p-4 rounded-2xl outline-none" required />
+            <input {...register("estimatedDelivery")} placeholder="Estimate (e.g. June 30, 2024)" className="w-full border border-slate-200 p-4 rounded-2xl outline-none" required />
+            
+            <select {...register("serviceType")} className="w-full border border-slate-200 p-4 rounded-2xl outline-none bg-white font-bold">
+               <option value="Standard Delivery">Standard Delivery</option>
+               <option value="Express Shipping">Express Shipping</option>
+               <option value="Priority Air">Priority Air</option>
+            </select>
+          </div>
+
+          <button 
+            type="submit" 
+            disabled={loading}
+            className="w-full bg-blue-600 text-white py-6 rounded-3xl font-bold shadow-xl shadow-blue-100 flex items-center justify-center gap-3 hover:bg-blue-700 transition-all disabled:opacity-50"
+          >
+            {loading ? <Loader2 className="animate-spin" /> : <><ArrowRight size={20} /> GENERATE SYSTEM ID</>}
+          </button>
         </div>
+
       </form>
     </div>
   );
