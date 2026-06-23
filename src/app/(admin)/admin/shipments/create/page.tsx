@@ -34,23 +34,25 @@ const onSubmit = async (data: any) => {
     formData.append('weight', data.weight);
     formData.append('serviceType', data.serviceType);
     formData.append('estimatedDelivery', data.estimatedDelivery);
-
+// Keep this: it only adds the image IF the admin selected one
     if (data.productImage?.[0]) {
       formData.append('productImage', data.productImage[0]);
     }
 
     try {
-      await API.post('/shipments', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      // 1. REMOVED: Headers (Axios handles this automatically for FormData)
+      const res = await API.post('/shipments', formData); 
+      
       toast.success("Shipment Created!");
       router.push('/admin/shipments');
     } catch (err: any) {
-      toast.error("Creation failed. Check backend.");
+      // 2. IMPROVED: Show actual error from backend if possible
+      const msg = err.response?.data?.message || "Creation failed. Check server connection.";
+      toast.error(msg);
+      console.error(err);
     } finally {
       setLoading(false);
     }
-};
   return (
     <div className="max-w-6xl mx-auto p-4 lg:p-10 text-slate-800">
       <div className="mb-10">
@@ -79,7 +81,13 @@ const onSubmit = async (data: any) => {
                     <p className="text-sm font-bold text-slate-400">Upload Item Image</p>
                  </div>
                )}
-               <input type="file" {...register("productImage")} onChange={handleImageChange} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" />
+               <input 
+                    type="file" 
+                      {...register("productImage")} // 👈 Removed {required: true}
+                        onChange={handleImageChange} 
+                       className="absolute inset-0 opacity-0 cursor-pointer" 
+                       accept="image/*" 
+              />
             </div>
           </div>
 
@@ -137,4 +145,5 @@ const onSubmit = async (data: any) => {
       </form>
     </div>
   );
+}
 }

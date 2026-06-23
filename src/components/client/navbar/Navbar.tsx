@@ -2,139 +2,125 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Menu, X, ChevronRight, ArrowRight } from 'lucide-react';
-import { ThemeToggle } from '../../.././components/shared/ThemeToggle';
+import { ThemeToggle } from '../../../components/shared/ThemeToggle';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Logo } from '../../../components/shared/Logo';
 
 const navLinks = [
   { name: 'Home', href: '/' },
-  { name: 'Services', href: '/services' },
-  { name: 'Tracking', href: '/tracking' },
   { name: 'About Us', href: '/about' },
-  { name: 'Contact Us', href: '/contact' },
+  { name: 'Services', href: '/services' },
   { name: 'Resources', href: '/resources' },
+  { name: 'Tracking', href: '/tracking' },
+  { name: 'Contact', href: '/contact' },
 ];
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
 
-  // Lock scroll when menu is open
-  useEffect(() => {
-    document.body.style.overflow = isOpen ? 'hidden' : 'unset';
-  }, [isOpen]);
+  useEffect(() => setIsOpen(false), [pathname]);
 
   return (
     <>
-      {/* 
-         MAIN HEADER 
-         z-[100] ensures it stays above the page content.
-      */}
-      <header className="sticky top-0 z-[100] w-full border-b border-white/5 bg-background/80 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
+      {/* MAIN HEADER (h-16) */}
+      <header className="sticky top-0 z-[100] w-full bg-background/95 backdrop-blur-md border-b border-slate-100 dark:border-white/5 h-16 flex items-center">
+        <div className="max-w-7xl mx-auto px-6 w-full flex justify-between items-center">
           
-          {/* 1. LOGO */}
-          <Link href="/" className="text-2xl font-black italic tracking-tighter text-primary">
-            LOGISWIFT
+          <Link href="/">
+            <Logo />
           </Link>
 
-          {/* 2. DESKTOP NAV LINKS (Center) */}
+          {/* Nav Links (Desktop) */}
           <div className="hidden lg:flex items-center gap-8">
             {navLinks.map((link) => (
               <Link 
                 key={link.name} 
                 href={link.href} 
-                className="text-xs font-bold uppercase tracking-widest text-foreground/60 hover:text-primary transition-all underline-offset-8 hover:underline"
+                className={`text-[10px] font-black uppercase tracking-[0.25em] transition-all hover:text-primary ${
+                  pathname === link.href ? 'text-primary' : 'text-slate-500 dark:text-slate-400'
+                }`}
               >
                 {link.name}
               </Link>
             ))}
           </div>
 
-          {/* 3. DESKTOP ACTIONS (Right) */}
           <div className="flex items-center gap-4">
-            <ThemeToggle />
+            <div className="hidden md:block">
+              <ThemeToggle />
+            </div>
             
             <Link 
               href="/quote" 
-              className="hidden md:flex items-center gap-2 bg-primary text-white px-6 py-2.5 rounded-none font-bold text-[10px] tracking-widest hover:bg-blue-500 transition-all shadow-lg shadow-primary/20"
+              className="hidden md:flex items-center bg-primary text-white px-6 py-2.5 rounded-none font-black text-[9px] tracking-widest uppercase hover:bg-blue-700 shadow-lg shadow-primary/10"
             >
-              GET A QUOTE <ArrowRight size={14} />
+              Get a Quote
             </Link>
 
-            {/* HAMBURGER TOGGLE (Mobile only) */}
             <button 
-              className="lg:hidden p-2 text-foreground transition-transform active:scale-90"
+              className="lg:hidden p-2 text-slate-900 dark:text-white" 
               onClick={() => setIsOpen(!isOpen)}
-              aria-label="Toggle Menu"
             >
-              {isOpen ? <X size={28} /> : <Menu size={28} />}
+              {isOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
           </div>
         </div>
       </header>
 
-      {/* 
-         MOBILE MENU OVERLAY
-         z-[1000] ensures it sits ABOVE the navbar and the homepage content.
-      */}
+      {/* COMPACT FLOATING MENU (Reduced Height) */}
       <AnimatePresence>
         {isOpen && (
-          <motion.div 
-            initial={{ opacity: 0, x: '100%' }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: '100%' }}
-            transition={{ type: 'tween', duration: 0.3 }}
-            /* 
-               IMPORTANT: 'bg-background' must be a SOLID hex in globals.css. 
-               This is what stops the "bleeding" effect.
-            */
-            className="fixed inset-0 z-[1000] bg-background w-full h-screen lg:hidden flex flex-col"
-          >
-            {/* Mobile Menu Header (Logo + Close Button) */}
-            <div className="h-20 px-6 flex justify-between items-center border-b border-white/5">
-              <span className="text-2xl font-black italic tracking-tighter text-primary">
-                LOGISWIFT
-              </span>
-              <button onClick={() => setIsOpen(false)} className="p-2 text-foreground">
-                <X size={28} />
-              </button>
-            </div>
+          <>
+            {/* Click-away Backdrop (Invisible but covers screen) */}
+            <div 
+              className="fixed inset-0 z-[90] lg:hidden" 
+              onClick={() => setIsOpen(false)} 
+            />
 
-            {/* Mobile Menu Links */}
-            <div className="flex flex-col p-6 space-y-2 overflow-y-auto">
-              
-              
-              {navLinks.map((link) => (
-                <Link 
-                  key={link.name} 
-                  href={link.href} 
-                  onClick={() => setIsOpen(false)}
-                  className="flex justify-between items-center p-5 rounded-none bg-foreground/5 hover:bg-primary/10 border-l-4 border-transparent hover:border-primary transition-all"
-                >
-                  <span className="text-2xl font-black text-foreground uppercase tracking-tight">
-                    {link.name}
-                  </span>
-                  <ChevronRight size={20} className="text-primary" />
-                </Link>
-              ))}
+            {/* The Compact Menu Card */}
+            <motion.div 
+              initial={{ opacity: 0, y: -10, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.98 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className="fixed top-16 right-4 w-[280px] z-[100] bg-white dark:bg-slate-900 shadow-2xl border border-slate-100 dark:border-white/10 lg:hidden flex flex-col rounded-none"
+            >
+              <div className="p-4 bg-slate-50 dark:bg-white/5 border-b border-slate-100 dark:border-white/5 flex justify-between items-center">
+                 
+                 <ThemeToggle />
+              </div>
 
-              {/* Mobile Action Button */}
-              <div className="pt-10">
+              {/* Height is dynamic based on content (h-auto) */}
+              <div className="py-2 flex flex-col">
+                {navLinks.map((link) => (
+                  <Link 
+                    key={link.name} 
+                    href={link.href}
+                    className={`flex items-center justify-between px-6 py-4 transition-all ${
+                      pathname === link.href 
+                      ? 'bg-primary/5 text-primary' 
+                      : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5'
+                    }`}
+                  >
+                    <span className="text-xs font-bold uppercase tracking-widest">{link.name}</span>
+                    <ChevronRight size={14} className={pathname === link.href ? 'text-primary' : 'opacity-20'} />
+                  </Link>
+                ))}
+              </div>
+
+              <div className="p-4 border-t border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-white/5">
                 <Link 
                   href="/quote"
-                  onClick={() => setIsOpen(false)}
-                  className="flex items-center justify-center w-full bg-primary py-6 rounded-none font-black text-white text-lg tracking-widest shadow-2xl shadow-primary/30"
+                  className="flex items-center justify-center w-full bg-primary text-white py-4 rounded-none font-black text-[10px] uppercase tracking-widest shadow-lg shadow-primary/20"
                 >
-                  GET A QUOTE
+                  Request Quote <ArrowRight className="ml-2" size={14} />
                 </Link>
               </div>
-            </div>
-
-            {/* Mobile Menu Footer */}
-            <div className="mt-auto p-10 border-t border-white/5 text-center">
-               <p className="text-xs text-gray-500 font-medium">Fast. Reliable. Everywhere.</p>
-            </div>
-          </motion.div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </>

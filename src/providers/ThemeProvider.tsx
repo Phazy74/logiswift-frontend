@@ -11,10 +11,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   
   return (
     <NextThemesProvider 
-      attribute="class" 
-      defaultTheme="dark" 
-      enableSystem={true}
-    >
+  attribute="class" // This is required for 'dark:' classes to work
+  defaultTheme="dark" 
+  enableSystem={true}
+>
       {children}
     </NextThemesProvider>
   );
