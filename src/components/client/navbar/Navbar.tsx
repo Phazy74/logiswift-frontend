@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Menu, X, ChevronRight, ArrowRight } from 'lucide-react';
-import { ThemeToggle } from '../../../components/shared/ThemeToggle';
+
 import { motion, AnimatePresence } from 'framer-motion';
 import { Logo } from '../../../components/shared/Logo';
 
@@ -50,7 +50,7 @@ export const Navbar = () => {
 
           <div className="flex items-center gap-4">
             <div className="hidden md:block">
-              <ThemeToggle />
+            
             </div>
             
             <Link 
@@ -90,7 +90,7 @@ export const Navbar = () => {
             >
               <div className="p-4 bg-slate-50 dark:bg-white/5 border-b border-slate-100 dark:border-white/5 flex justify-between items-center">
                  
-                 <ThemeToggle />
+                 
               </div>
 
               {/* Height is dynamic based on content (h-auto) */}

@@ -1,20 +1,16 @@
-// src/providers/ThemeProvider.tsx
 "use client";
 
 import * as React from "react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  // We use a simple state check to ensure we only render the provider 
-  // after the initial mount if the error persists, 
-  // but usually, suppressHydrationWarning is enough.
-  
   return (
     <NextThemesProvider 
-  attribute="class" // This is required for 'dark:' classes to work
-  defaultTheme="dark" 
-  enableSystem={true}
->
+      attribute="class" 
+      defaultTheme="light" 
+      forcedTheme="light" // 👈 This locks the site to light mode
+      enableSystem={false}
+    >
       {children}
     </NextThemesProvider>
   );
